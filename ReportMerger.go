@@ -129,7 +129,7 @@ func writeXls() {
 		if val, ok := row[2].(float64); ok {
 			everything = int64(val * 100)
 		}
-		if sum != everything {
+		if (sum / 100.00) != (everything / 100.00) {
 			fmt.Println(row[0], "- Missmatch Found - EVERYTHING:", everything/100.00, "SUM:", sum/100.00)
 		}
 
