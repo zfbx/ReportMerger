@@ -74,9 +74,14 @@ func readXls(filename string, col int) {
 		}
 
 		if col == 0 { // base
-			output[row[0]] = []interface{}{row[0], row[1], dr - cr, 0, 0, 0, 0, 0, 0, 0}
+			output[row[0]] = []interface{}{row[0], row[1], dr - cr, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}
 		} else { // other
-			output[row[0]][col] = dr - cr
+			_, ok := output[row[0]]
+			if ok {
+				output[row[0]][col] = dr - cr
+			} else {
+				fmt.Println("ERROR: GL ", row[0], " doesn't exist in BASE")
+			}
 		}
 	}
 }
@@ -110,6 +115,24 @@ func writeXls() {
 
 	index := 2
 	for _, row := range output {
+		var sum int64 = 0
+		for i := 3; i < len(row); i++ {
+			if val, ok := row[i].(float64); ok {
+				// fmt.Println(i, "-", val)
+				sum += int64(val * 100)
+			} else {
+				fmt.Printf("Value at index %d is not of type float64\n", i)
+			}
+		}
+
+		var everything int64
+		if val, ok := row[2].(float64); ok {
+			everything = int64(val * 100)
+		}
+		if sum != everything {
+			fmt.Println(row[0], "- Missmatch Found - EVERYTHING:", everything/100.00, "SUM:", sum/100.00)
+		}
+
 		for ci, col := range row {
 			colName, _ := excelize.ColumnNumberToName(ci + 1)
 			cell := colName + strconv.Itoa(index)
